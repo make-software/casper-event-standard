@@ -1,0 +1,14 @@
+[package]
+name = "casper-event-standard"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+doctest = false
+
+[dependencies]
+casper-types = "1.5.0"
+casper-event-standard-macro = { path = "../casper-event-standard-macro" }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+casper-contract = { version = "1.4.4" }

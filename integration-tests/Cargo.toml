@@ -1,0 +1,30 @@
+[package]
+name = "integration-tests"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+casper-types = "1.5.0"
+casper-event-standard = { path = "../casper-event-standard" }
+casper-contract = { version = "1.4.4", optional = true }
+casper-engine-test-support = { version = "2.0.3", optional = true }
+
+[features]
+default = ["test-support", "contract-support"]
+contract-support = [ "dep:casper-contract" ]
+test-support = [ "dep:casper-engine-test-support" ]
+
+[[bin]]
+name = "event_producer"
+path = "bin/event_producer.rs"
+required-features = ["contract-support"]
+
+[[bin]]
+name = "event_initializer"
+path = "bin/event_initializer.rs"
+required-features = ["contract-support"]
+
+[[test]]
+name = "vm_tests"
+path = "tests/vm_tests.rs"
+required-features = ["test-support"]

@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "casper-event-standard",
+    "casper-event-standard-macro",
+    "integration-tests"
+]
