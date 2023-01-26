@@ -7,7 +7,7 @@ use casper_types::{
 use crate::{cl_type2::CLType2, EventInstance};
 
 #[derive(Default, Debug, PartialEq)]
-pub struct Schema(BTreeMap<String, CLType2>);
+pub struct Schema(Vec<(String, CLType2)>);
 
 impl Schema {
     pub fn new() -> Self {
@@ -15,13 +15,13 @@ impl Schema {
     }
 
     pub fn with_elem(&mut self, name: &str, ty: CLType) {
-        self.0.insert(String::from(name), CLType2(ty));
+        self.0.push((String::from(name), CLType2(ty)));
     }
 }
 
 impl CLTyped for Schema {
     fn cl_type() -> CLType {
-        BTreeMap::<String, CLType2>::cl_type()
+        Vec::<(String, CLType2)>::cl_type()
     }
 }
 
@@ -37,7 +37,7 @@ impl ToBytes for Schema {
 
 impl FromBytes for Schema {
     fn from_bytes(bytes: &[u8]) -> Result<(Self, &[u8]), bytesrepr::Error> {
-        BTreeMap::<String, CLType2>::from_bytes(bytes).map(|(map, bytes)| (Schema(map), bytes))
+        Vec::<(String, CLType2)>::from_bytes(bytes).map(|(map, bytes)| (Schema(map), bytes))
     }
 }
 
