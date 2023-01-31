@@ -4,9 +4,18 @@ use casper_types::{
     CLType, CLTyped,
 };
 
-// TODO: Desc
-// https://github.com/casper-network/casper-node/issues/3593
-
+/// A wrapper on top of [`CLType`].
+///
+/// It is required as the original [`CLType`] doesn't implement [`CLTyped`],
+/// [`FromBytes`] and [`ToBytes`].
+///
+/// It can be removed if this [`issue`] is resolved.
+///
+/// [`CLType`]: casper_types::CLType
+/// [`CLTyped`]: casper_types::CLTyped
+/// [`FromBytes`]: casper_types::bytesrepr::FromBytes
+/// [`ToBytes`]: casper_types::bytesrepr::ToBytes
+/// [`issue`]: https://github.com/casper-network/casper-node/issues/3593
 #[derive(PartialEq, Debug)]
 pub struct CLType2(pub CLType);
 

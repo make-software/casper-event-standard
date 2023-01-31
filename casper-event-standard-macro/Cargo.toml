@@ -1,7 +1,12 @@
 [package]
 name = "casper-event-standard-macro"
-version = "0.1.0"
-edition = "2021"
+version.workspace = true
+authors.workspace = true
+description.workspace = true
+edition.workspace = true
+readme.workspace = true
+repository.workspace = true
+license.workspace = true
 
 [lib]
 proc-macro = true

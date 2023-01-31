@@ -1,3 +1,5 @@
+//! `Event` macro for `casper-event-standard` crate.
+
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, TokenStream as TokenStream2};
 use quote::{format_ident, quote, TokenStreamExt};

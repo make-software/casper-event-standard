@@ -1,6 +1,9 @@
 default:
     just -l
 
+prepare:
+	rustup target add wasm32-unknown-unknown
+
 test: test-lib test-macro test-integration
 
 test-lib:
@@ -35,6 +38,7 @@ clean:
 
 docs:
     cargo doc --no-deps --open \
+        --target wasm32-unknown-unknown \
         -p casper-event-standard \
         -p casper-event-standard-macro
 
@@ -53,3 +57,7 @@ check-lint: clippy
 
 lint: clippy
 	cargo fmt
+
+release:
+    cargo publish -p casper-event-standard-macro && sleep 100
+    cargo publish -p casper-event-standard
