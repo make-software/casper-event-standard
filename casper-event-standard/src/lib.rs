@@ -54,6 +54,16 @@ mod contract;
 #[cfg(target_arch = "wasm32")]
 pub use contract::{emit, init};
 
+#[cfg(not(target_arch = "wasm32"))]
+pub fn init(_schemas: Schemas) {
+    panic!("Init can be used only in wasm32.")
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+pub fn emit<T>(_event: T) {
+    panic!("Emit can be used only in wasm32.")
+}
+
 /// The key under which the events are stored.
 pub const EVENTS_DICT: &str = "__events";
 /// The key under which the events length is stored.

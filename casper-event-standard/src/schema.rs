@@ -4,10 +4,14 @@ use casper_types::{
     CLType, CLTyped,
 };
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
 use crate::{cl_type2::CLType2, EventInstance};
 
 /// The information about a single event.
-#[derive(Default, Debug, PartialEq)]
+#[derive(Default, Debug, PartialEq, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Schema(Vec<(String, CLType2)>);
 
 impl Schema {
@@ -19,6 +23,11 @@ impl Schema {
     /// Adds new named element.
     pub fn with_elem(&mut self, name: &str, ty: CLType) {
         self.0.push((String::from(name), CLType2(ty)));
+    }
+
+    /// Convert to underlying vector.
+    pub fn to_vec(self) -> Vec<(String, CLType2)> {
+        self.0
     }
 }
 
@@ -45,8 +54,9 @@ impl FromBytes for Schema {
 }
 
 /// The information about multiple events.
-#[derive(Default, Debug, PartialEq)]
-pub struct Schemas(BTreeMap<String, Schema>);
+#[derive(Default, Debug, PartialEq, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+pub struct Schemas(pub BTreeMap<String, Schema>);
 
 impl Schemas {
     /// Creates an empty object.
