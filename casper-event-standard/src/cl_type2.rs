@@ -4,6 +4,9 @@ use casper_types::{
     CLType, CLTyped,
 };
 
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
+
 /// A wrapper on top of [`CLType`].
 ///
 /// It is required as the original [`CLType`] doesn't implement [`CLTyped`],
@@ -16,8 +19,16 @@ use casper_types::{
 /// [`FromBytes`]: casper_types::bytesrepr::FromBytes
 /// [`ToBytes`]: casper_types::bytesrepr::ToBytes
 /// [`issue`]: https://github.com/casper-network/casper-node/issues/3593
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct CLType2(pub CLType);
+
+impl CLType2 {
+    /// Turn it into original [`CLType`]: casper_types::CLType.
+    pub fn downcast(self) -> CLType {
+        self.0
+    }
+}
 
 impl CLTyped for CLType2 {
     fn cl_type() -> CLType {
