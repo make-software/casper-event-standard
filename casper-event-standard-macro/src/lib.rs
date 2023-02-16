@@ -50,7 +50,12 @@ fn generate_to_bytes_impl(event_ident: &Ident, fields: &[(Ident, Type)]) -> Toke
     let append_bytes = fields
         .iter()
         .map(|(ident, _)| ident)
-        .flat_map(|ident| quote!(vec.extend(self.#ident.to_bytes()?);))
+        .flat_map(|ident| {
+            quote! {
+                casper_event_standard::validate_type(&self.#ident)?;
+                vec.extend(self.#ident.to_bytes()?);
+            }
+        })
         .collect::<TokenStream2>();
     let mut sum_serialized_lengths = quote! {
         size += #name_literal.serialized_length();
@@ -178,8 +183,11 @@ mod tests {
                 fn to_bytes(&self) -> Result<casper_event_standard::alloc::vec::Vec<u8>, casper_event_standard::casper_types::bytesrepr::Error> {
                     let mut vec = casper_event_standard::alloc::vec::Vec::with_capacity(self.serialized_length());
                     vec.append(&mut stringify!(event_Transfer).to_bytes()?);
+                    casper_event_standard::validate_type(&self.amount)?;
                     vec.extend(self.amount.to_bytes()?);
+                    casper_event_standard::validate_type(&self.from)?;
                     vec.extend(self.from.to_bytes()?);
+                    casper_event_standard::validate_type(&self.to)?;
                     vec.extend(self.to.to_bytes()?);
                     Ok(vec)
                 }

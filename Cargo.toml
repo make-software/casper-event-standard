@@ -6,7 +6,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Maciej Zieliński <maciej@odra.dev>"]
 description = "The smart contract level events for Casper."
 edition = "2021"
