@@ -70,6 +70,10 @@ pub const EVENTS_DICT: &str = "__events";
 pub const EVENTS_LENGTH: &str = "__events_length";
 /// The key under which the event schemas are stored.
 pub const EVENTS_SCHEMA: &str = "__events_schema";
+/// The key under which the ces version is stored.
+pub const CES_VERSION_KEY: &str = "ces_version";
+/// The version of CES implemented in this library.
+pub const CES_VERSION: &str = "0.1";
 
 /// Helper trait, used for the schema generation.
 pub trait EventInstance {

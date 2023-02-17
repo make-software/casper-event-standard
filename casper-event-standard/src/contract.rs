@@ -1,4 +1,4 @@
-use crate::{schema::Schemas, EVENTS_DICT, EVENTS_LENGTH, EVENTS_SCHEMA};
+use crate::{schema::Schemas, EVENTS_DICT, EVENTS_LENGTH, EVENTS_SCHEMA, CES_VERSION_KEY, CES_VERSION};
 use alloc::string::ToString;
 use casper_contract::contract_api::{runtime, storage};
 use casper_contract::unwrap_or_revert::UnwrapOrRevert;
@@ -18,6 +18,7 @@ pub fn init(schemas: Schemas) {
     storage::new_dictionary(EVENTS_DICT).unwrap_or_revert();
     runtime::put_key(EVENTS_LENGTH, storage::new_uref(0u32).into());
     runtime::put_key(EVENTS_SCHEMA, storage::new_uref(schemas).into());
+    runtime::put_key(CES_VERSION_KEY, storage::new_uref(CES_VERSION).into());
 }
 
 /// Emits an event.
