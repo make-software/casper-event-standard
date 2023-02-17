@@ -73,7 +73,7 @@ pub const EVENTS_SCHEMA: &str = "__events_schema";
 /// The key under which the ces version is stored.
 pub const CES_VERSION_KEY: &str = "ces_version";
 /// The version of CES implemented in this library.
-pub const CES_VERSION: &str = "0.1";
+pub const CES_VERSION: &str = "1.1";
 
 /// Helper trait, used for the schema generation.
 pub trait EventInstance {
