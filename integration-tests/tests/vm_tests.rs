@@ -2,7 +2,9 @@ use casper_engine_test_support::{
     ExecuteRequestBuilder, InMemoryWasmTestBuilder, DEFAULT_ACCOUNT_ADDR,
     DEFAULT_RUN_GENESIS_REQUEST,
 };
-use casper_event_standard::{Schemas, EVENTS_DICT, EVENTS_LENGTH, EVENTS_SCHEMA};
+use casper_event_standard::{
+    Schemas, CES_VERSION, CES_VERSION_KEY, EVENTS_DICT, EVENTS_LENGTH, EVENTS_SCHEMA,
+};
 use casper_types::{
     bytesrepr::{Bytes, FromBytes},
     contracts::NamedKeys,
@@ -60,6 +62,18 @@ impl TestEnv {
             .unwrap()
     }
 
+    pub fn ces_version(&self) -> String {
+        let key = Key::from(*DEFAULT_ACCOUNT_ADDR);
+        self.context
+            .query(None, key, &[String::from(CES_VERSION_KEY)])
+            .unwrap()
+            .as_cl_value()
+            .unwrap()
+            .clone()
+            .into_t()
+            .unwrap()
+    }
+
     pub fn event_at<T: FromBytes>(&self, index: u32) -> Option<T> {
         let dictionary_seed_uref: URef = *self
             .named_keys()
@@ -100,7 +114,9 @@ fn test_events_initalization() {
     assert!(named_keys.contains_key(EVENTS_DICT));
     assert!(named_keys.contains_key(EVENTS_LENGTH));
     assert!(named_keys.contains_key(EVENTS_SCHEMA));
+    assert!(named_keys.contains_key(CES_VERSION_KEY));
     assert_eq!(test_env.events_length(), 0);
+    assert_eq!(test_env.ces_version(), CES_VERSION);
 
     let schemas = test_env.schemas();
     let mut expected_schemas = Schemas::new();
