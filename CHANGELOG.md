@@ -13,7 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 All parts of an event need to be `non-Any` `CLValue`s.
 The check happens at the runtime in `to_bytes()` function.
 `Any` causes problems to parse events in a generic
-way because ofthe lack of a length indicator.
+way because of the lack of a length indicator.
+- Added `ces_version` named key to refer to the version of the CES in use.
 
 ## [0.1.1] - 2023-02-13
 
