@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use casper_event_standard::{try_full_name_from_bytes, Event, EventInstance, Schema};
 use casper_types::{
     bytesrepr::{FromBytes, ToBytes},
@@ -50,4 +52,33 @@ fn test_event_schema() {
     expected_schema.with_elem("from", Key::cl_type());
     expected_schema.with_elem("to", Key::cl_type());
     assert_eq!(Transfer::schema(), expected_schema);
+}
+
+#[test]
+fn test_serialization_of_any() {
+    #[derive(Event)]
+    struct Simple {
+        transfer: Transfer,
+    }
+
+    let event = Simple {
+        transfer: mock_transfer(),
+    };
+    assert_eq!(
+        event.to_bytes(),
+        Err(casper_types::bytesrepr::Error::Formatting)
+    );
+
+    #[derive(Event)]
+    struct Complex {
+        transfers: BTreeMap<(u32,), Result<Vec<Transfer>, String>>,
+    }
+
+    let event = Complex {
+        transfers: BTreeMap::new(),
+    };
+    assert_eq!(
+        event.to_bytes(),
+        Err(casper_types::bytesrepr::Error::Formatting)
+    );
 }

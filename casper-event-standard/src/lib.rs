@@ -33,7 +33,7 @@ pub extern crate alloc;
 pub use casper_types;
 
 use alloc::string::String;
-use casper_types::bytesrepr;
+use casper_types::{bytesrepr, CLType, CLTyped};
 
 /// Macro that derives [`CLTyped`], [`FromBytes`], [`ToBytes`] and [`EventInstance`].
 ///
@@ -83,4 +83,46 @@ pub trait EventInstance {
 pub fn try_full_name_from_bytes(bytes: &[u8]) -> Result<String, bytesrepr::Error> {
     let (name, _) = bytesrepr::FromBytes::from_bytes(bytes)?;
     Ok(name)
+}
+
+/// Make sure the type of a value is not [`CLType::Any`](casper_types::CLType::Any).
+pub fn validate_type<T: CLTyped>(_: &T) -> Result<(), bytesrepr::Error> {
+    if has_any(&T::cl_type()) {
+        Err(bytesrepr::Error::Formatting)
+    } else {
+        Ok(())
+    }
+}
+
+fn has_any(ty: &CLType) -> bool {
+    match ty {
+        // Positive.
+        CLType::Any => true,
+
+        // Negative.
+        CLType::Bool
+        | CLType::I32
+        | CLType::I64
+        | CLType::U8
+        | CLType::U32
+        | CLType::U64
+        | CLType::U128
+        | CLType::U256
+        | CLType::U512
+        | CLType::Unit
+        | CLType::String
+        | CLType::Key
+        | CLType::URef
+        | CLType::PublicKey
+        | CLType::ByteArray(_) => false,
+
+        // Need recursive check.
+        CLType::Option(ty) => has_any(ty),
+        CLType::List(ty) => has_any(ty),
+        CLType::Result { ok, err } => has_any(ok) || has_any(err),
+        CLType::Map { key, value } => has_any(key) || has_any(value),
+        CLType::Tuple1([ty]) => has_any(ty),
+        CLType::Tuple2([ty1, ty2]) => has_any(ty1) || has_any(ty2),
+        CLType::Tuple3([ty1, ty2, ty3]) => has_any(ty1) || has_any(ty2) || has_any(ty3),
+    }
 }
