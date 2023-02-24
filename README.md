@@ -1,6 +1,10 @@
 # Casper Event Standard
 
-The smart contract level events for Casper.
+The Casper Event Standard is a Rust library that provides a simple and standardized way for smart contracts on the Casper Network to emit events. Events are an important tool for decentralized applications, as they allow contracts to communicate with external services in a transparent and decentralized way.
+
+With the Casper Event Standard, developers can easily define custom event types and register them in the contract. The library provides a convenient API for emitting events. This makes it easy to build complex applications that rely on event-driven architecture.
+
+Whether you're building a decentralized exchange, a prediction market, or any other type of blockchain application, the Casper Event Standard is an essential tool for creating reliable and scalable smart contracts. So why wait? Start using the Casper Event Standard today and take your decentralized application to the next level!
 
 ## Usage
 
