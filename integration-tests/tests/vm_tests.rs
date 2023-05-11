@@ -1,26 +1,61 @@
 use casper_engine_test_support::{
-    ExecuteRequestBuilder, InMemoryWasmTestBuilder, DEFAULT_ACCOUNT_ADDR,
-    DEFAULT_RUN_GENESIS_REQUEST,
+    ExecuteRequestBuilder, InMemoryWasmTestBuilder, DEFAULT_ACCOUNT_INITIAL_BALANCE,
+    DEFAULT_GENESIS_CONFIG, DEFAULT_GENESIS_CONFIG_HASH,
 };
 use casper_event_standard::{
     Schemas, CES_VERSION, CES_VERSION_KEY, EVENTS_DICT, EVENTS_LENGTH, EVENTS_SCHEMA,
 };
+use casper_execution_engine::core::engine_state::{
+    run_genesis_request::RunGenesisRequest, GenesisAccount,
+};
 use casper_types::{
+    account::AccountHash,
     bytesrepr::{Bytes, FromBytes},
     contracts::NamedKeys,
-    Key, RuntimeArgs, StoredValue, URef,
+    Key, Motes, PublicKey, RuntimeArgs, SecretKey, StoredValue, URef, U512,
 };
 use integration_tests::{Mint, Transfer};
 
 struct TestEnv {
     context: InMemoryWasmTestBuilder,
+    account_addr: AccountHash,
 }
 
 impl TestEnv {
     pub fn new() -> TestEnv {
+        // Create keypair.
+        let secret_key = SecretKey::ed25519_from_bytes([7u8; 32]).unwrap();
+        let public_key = PublicKey::from(&secret_key);
+
+        // Create an AccountHash from a public key.
+        let account_addr = AccountHash::from(&public_key);
+        // Create a GenesisAccount.
+        let account = GenesisAccount::account(
+            public_key,
+            Motes::new(U512::from(DEFAULT_ACCOUNT_INITIAL_BALANCE)),
+            None,
+        );
+
+        let mut genesis_config = DEFAULT_GENESIS_CONFIG.clone();
+        genesis_config.ee_config_mut().push_account(account);
+
+        let run_genesis_request = RunGenesisRequest::new(
+            *DEFAULT_GENESIS_CONFIG_HASH,
+            genesis_config.protocol_version(),
+            genesis_config.take_ee_config(),
+        );
+
         let mut context = InMemoryWasmTestBuilder::default();
-        context.run_genesis(&DEFAULT_RUN_GENESIS_REQUEST).commit();
-        TestEnv { context }
+        context.run_genesis(&run_genesis_request).commit();
+
+        TestEnv {
+            context,
+            account_addr,
+        }
+    }
+
+    pub fn default_account(&self) -> AccountHash {
+        self.account_addr
     }
 
     pub fn deploy_event_producer_wasm(&mut self) {
@@ -33,13 +68,13 @@ impl TestEnv {
 
     pub fn named_keys(&self) -> NamedKeys {
         self.context
-            .get_expected_account(*DEFAULT_ACCOUNT_ADDR)
+            .get_expected_account(self.default_account())
             .named_keys()
             .clone()
     }
 
     pub fn schemas(&self) -> Schemas {
-        let key = Key::from(*DEFAULT_ACCOUNT_ADDR);
+        let key = Key::from(self.default_account());
         self.context
             .query(None, key, &[String::from(EVENTS_SCHEMA)])
             .unwrap()
@@ -51,7 +86,7 @@ impl TestEnv {
     }
 
     pub fn events_length(&self) -> u32 {
-        let key = Key::from(*DEFAULT_ACCOUNT_ADDR);
+        let key = Key::from(self.default_account());
         self.context
             .query(None, key, &[String::from(EVENTS_LENGTH)])
             .unwrap()
@@ -63,7 +98,7 @@ impl TestEnv {
     }
 
     pub fn ces_version(&self) -> String {
-        let key = Key::from(*DEFAULT_ACCOUNT_ADDR);
+        let key = Key::from(self.default_account());
         self.context
             .query(None, key, &[String::from(CES_VERSION_KEY)])
             .unwrap()
@@ -95,7 +130,7 @@ impl TestEnv {
 
     fn deploy_wasm(&mut self, name: &str) {
         let wasm_exec_request =
-            ExecuteRequestBuilder::standard(*DEFAULT_ACCOUNT_ADDR, name, RuntimeArgs::new())
+            ExecuteRequestBuilder::standard(self.default_account(), name, RuntimeArgs::new())
                 .build();
 
         self.context
