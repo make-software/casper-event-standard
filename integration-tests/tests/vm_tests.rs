@@ -1,6 +1,6 @@
 use casper_engine_test_support::{
     ExecuteRequestBuilder, InMemoryWasmTestBuilder, DEFAULT_ACCOUNT_INITIAL_BALANCE,
-    DEFAULT_GENESIS_CONFIG, DEFAULT_GENESIS_CONFIG_HASH,
+    DEFAULT_CHAINSPEC_REGISTRY, DEFAULT_GENESIS_CONFIG, DEFAULT_GENESIS_CONFIG_HASH,
 };
 use casper_event_standard::{
     Schemas, CES_VERSION, CES_VERSION_KEY, EVENTS_DICT, EVENTS_LENGTH, EVENTS_SCHEMA,
@@ -43,6 +43,7 @@ impl TestEnv {
             *DEFAULT_GENESIS_CONFIG_HASH,
             genesis_config.protocol_version(),
             genesis_config.take_ee_config(),
+            DEFAULT_CHAINSPEC_REGISTRY.clone(),
         );
 
         let mut context = InMemoryWasmTestBuilder::default();
