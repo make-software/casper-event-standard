@@ -25,14 +25,19 @@ pub fn init(schemas: Schemas) {
 
 /// Emits an event.
 pub fn emit<T: ToBytes>(event: T) {
+    let event_bytes = event.to_bytes().unwrap_or_revert();
+    let event_bytes: Bytes = event_bytes.into();
+    emit_bytes(event_bytes);
+}
+
+/// Emits an event. Don't convert to bytes.
+pub fn emit_bytes(event_bytes: Bytes) {
     let length_key = runtime::get_key(EVENTS_LENGTH).unwrap_or_revert();
     let length_uref = length_key.try_into().unwrap_or_revert();
     let lenght: u32 = storage::read(length_uref)
         .unwrap_or_revert()
         .unwrap_or_revert();
     let seed = event_dict_seed();
-    let event_bytes = event.to_bytes().unwrap_or_revert();
-    let event_bytes: Bytes = event_bytes.into();
     storage::dictionary_put(seed, &lenght.to_string(), event_bytes);
     storage::write(length_uref, lenght + 1);
 }
