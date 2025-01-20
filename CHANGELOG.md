@@ -38,10 +38,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - `CLType::Any` is not supported anymore.
-All parts of an event need to be `non-Any` `CLValue`s.
-The check happens at the runtime in `to_bytes()` function.
-`Any` causes problems to parse events in a generic
-way because of the lack of a length indicator.
+  All parts of an event need to be `non-Any` `CLValue`s.
+  The check happens at the runtime in `to_bytes()` function.
+  `Any` causes problems to parse events in a generic
+  way because of the lack of a length indicator.
 
 ## [0.1.1] - 2023-02-13
 
@@ -49,7 +49,7 @@ way because of the lack of a length indicator.
 
 - `serde` feature. It is disabled by default.
 - `emit` and `init` has now `#[cfg(not(target_arch = "wasm32"))]`
-implementations that panic when used. It is mostly for the easy of development.
+  implementations that panic when used. It is mostly for the easy of development.
 
 ## [0.1.0] - 2023-01-31
 
