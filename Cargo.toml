@@ -2,7 +2,7 @@
 members = [
     "casper-event-standard",
     "casper-event-standard-macro",
-    "integration-tests"
+    "integration-tests",
 ]
 resolver = "2"
 
@@ -14,3 +14,7 @@ edition = "2021"
 readme = "./README.md"
 repository = "https://github.com/make-software/casper-event-standard"
 license = "Apache-2.0"
+
+[profile.release]
+codegen-units = 1
+lto = true

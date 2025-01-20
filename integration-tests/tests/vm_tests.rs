@@ -1,23 +1,20 @@
 use casper_engine_test_support::{
-    ExecuteRequestBuilder, InMemoryWasmTestBuilder, DEFAULT_ACCOUNT_INITIAL_BALANCE,
-    DEFAULT_CHAINSPEC_REGISTRY, DEFAULT_GENESIS_CONFIG, DEFAULT_GENESIS_CONFIG_HASH,
+    utils::create_run_genesis_request, ExecuteRequestBuilder, LmdbWasmTestBuilder,
+    DEFAULT_ACCOUNT_INITIAL_BALANCE,
 };
 use casper_event_standard::{
     Schemas, CES_VERSION, CES_VERSION_KEY, EVENTS_DICT, EVENTS_LENGTH, EVENTS_SCHEMA,
-};
-use casper_execution_engine::core::engine_state::{
-    run_genesis_request::RunGenesisRequest, GenesisAccount,
 };
 use casper_types::{
     account::AccountHash,
     bytesrepr::{Bytes, FromBytes},
     contracts::NamedKeys,
-    Key, Motes, PublicKey, RuntimeArgs, SecretKey, StoredValue, URef, U512,
+    GenesisAccount, Key, Motes, PublicKey, RuntimeArgs, SecretKey, StoredValue, URef, U512,
 };
 use integration_tests::{Mint, Transfer};
 
 struct TestEnv {
-    context: InMemoryWasmTestBuilder,
+    builder: LmdbWasmTestBuilder,
     account_addr: AccountHash,
 }
 
@@ -36,21 +33,11 @@ impl TestEnv {
             None,
         );
 
-        let mut genesis_config = DEFAULT_GENESIS_CONFIG.clone();
-        genesis_config.ee_config_mut().push_account(account);
-
-        let run_genesis_request = RunGenesisRequest::new(
-            *DEFAULT_GENESIS_CONFIG_HASH,
-            genesis_config.protocol_version(),
-            genesis_config.take_ee_config(),
-            DEFAULT_CHAINSPEC_REGISTRY.clone(),
-        );
-
-        let mut context = InMemoryWasmTestBuilder::default();
-        context.run_genesis(&run_genesis_request).commit();
+        let mut builder = LmdbWasmTestBuilder::default();
+        builder.run_genesis(create_run_genesis_request(vec![account]));
 
         TestEnv {
-            context,
+            builder,
             account_addr,
         }
     }
@@ -68,15 +55,16 @@ impl TestEnv {
     }
 
     pub fn named_keys(&self) -> NamedKeys {
-        self.context
-            .get_expected_account(self.default_account())
+        self.builder
+            .get_entity_with_named_keys_by_account_hash(self.default_account())
+            .unwrap()
             .named_keys()
             .clone()
     }
 
     pub fn schemas(&self) -> Schemas {
         let key = Key::from(self.default_account());
-        self.context
+        self.builder
             .query(None, key, &[String::from(EVENTS_SCHEMA)])
             .unwrap()
             .as_cl_value()
@@ -88,7 +76,7 @@ impl TestEnv {
 
     pub fn events_length(&self) -> u32 {
         let key = Key::from(self.default_account());
-        self.context
+        self.builder
             .query(None, key, &[String::from(EVENTS_LENGTH)])
             .unwrap()
             .as_cl_value()
@@ -100,7 +88,7 @@ impl TestEnv {
 
     pub fn ces_version(&self) -> String {
         let key = Key::from(self.default_account());
-        self.context
+        self.builder
             .query(None, key, &[String::from(CES_VERSION_KEY)])
             .unwrap()
             .as_cl_value()
@@ -119,7 +107,7 @@ impl TestEnv {
             .unwrap();
 
         let event: StoredValue = self
-            .context
+            .builder
             .query_dictionary_item(None, dictionary_seed_uref, &index.to_string())
             .unwrap();
 
@@ -134,7 +122,7 @@ impl TestEnv {
             ExecuteRequestBuilder::standard(self.default_account(), name, RuntimeArgs::new())
                 .build();
 
-        self.context
+        self.builder
             .exec(wasm_exec_request)
             .expect_success()
             .commit();
@@ -147,10 +135,10 @@ fn test_events_initalization() {
     test_env.deploy_event_initializer_wasm();
 
     let named_keys = test_env.named_keys();
-    assert!(named_keys.contains_key(EVENTS_DICT));
-    assert!(named_keys.contains_key(EVENTS_LENGTH));
-    assert!(named_keys.contains_key(EVENTS_SCHEMA));
-    assert!(named_keys.contains_key(CES_VERSION_KEY));
+    assert!(named_keys.contains(EVENTS_DICT));
+    assert!(named_keys.contains(EVENTS_LENGTH));
+    assert!(named_keys.contains(EVENTS_SCHEMA));
+    assert!(named_keys.contains(CES_VERSION_KEY));
     assert_eq!(test_env.events_length(), 0);
     assert_eq!(test_env.ces_version(), CES_VERSION);
 
