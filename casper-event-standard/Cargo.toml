@@ -12,15 +12,15 @@ license.workspace = true
 doctest = false
 
 [dependencies]
-casper-types = "3.0.0"
-casper-event-standard-macro = { version = "0.4.0", path = "../casper-event-standard-macro" }
+casper-types = { git = "https://github.com/casper-network/casper-node.git", default-features = false }
+casper-event-standard-macro = { version = "0.5.0", path = "../casper-event-standard-macro" }
 serde = { version = "1.0", features = ["derive"], optional = true }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-casper-contract = { version = "3.0.0", default-features = false }
+casper-contract = { git = "https://github.com/casper-network/casper-node.git" }
 
 [package.metadata.docs.rs]
 default-target = "wasm32-unknown-unknown"
 
 [features]
-serde = [ "dep:serde" ]
+serde = ["dep:serde"]

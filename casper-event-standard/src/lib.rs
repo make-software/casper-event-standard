@@ -35,6 +35,9 @@ pub use casper_types;
 use alloc::string::String;
 use casper_types::{bytesrepr, CLType, CLTyped};
 
+#[cfg(not(target_arch = "wasm32"))]
+use casper_types::bytesrepr::Bytes;
+
 /// Macro that derives [`CLTyped`], [`FromBytes`], [`ToBytes`] and [`EventInstance`].
 ///
 /// [`CLTyped`]: casper_types::CLTyped
@@ -52,7 +55,7 @@ pub use schema::{Schema, Schemas};
 mod contract;
 
 #[cfg(target_arch = "wasm32")]
-pub use contract::{emit, init};
+pub use contract::{emit, emit_bytes, init};
 
 #[cfg(not(target_arch = "wasm32"))]
 pub fn init(_schemas: Schemas) {
@@ -61,6 +64,11 @@ pub fn init(_schemas: Schemas) {
 
 #[cfg(not(target_arch = "wasm32"))]
 pub fn emit<T>(_event: T) {
+    panic!("Emit can be used only in wasm32.")
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+pub fn emit_bytes(_event: Bytes) {
     panic!("Emit can be used only in wasm32.")
 }
 
