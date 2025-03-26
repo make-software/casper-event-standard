@@ -14,5 +14,11 @@ readme = "./README.md"
 repository = "https://github.com/make-software/casper-event-standard"
 license = "Apache-2.0"
 
+[workspace.dependencies]
+casper-types = "5.0.0"
+casper-contract = { git = "https://github.com/casper-network/casper-node.git", branch = "release-2.0.0-rc9", default-features = false }
+casper-execution-engine = { git = "https://github.com/casper-network/casper-node.git", branch = "release-2.0.0-rc9" }
+casper-engine-test-support = { git = "https://github.com/casper-network/casper-node.git", branch = "release-2.0.0-rc9" }
+
 [patch.crates-io]
 casper-types = { version = "5.0.0", git = "https://github.com/casper-network/casper-node.git", branch = "release-2.0.0-rc9" }
