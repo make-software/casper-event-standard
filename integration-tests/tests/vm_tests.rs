@@ -1,23 +1,20 @@
 use casper_engine_test_support::{
-    ExecuteRequestBuilder, InMemoryWasmTestBuilder, DEFAULT_ACCOUNT_INITIAL_BALANCE,
-    DEFAULT_CHAINSPEC_REGISTRY, DEFAULT_GENESIS_CONFIG, DEFAULT_GENESIS_CONFIG_HASH,
+    ExecuteRequestBuilder, LmdbWasmTestBuilder, DEFAULT_ACCOUNT_INITIAL_BALANCE,
+    LOCAL_GENESIS_REQUEST,
 };
 use casper_event_standard::{
     Schemas, CES_VERSION, CES_VERSION_KEY, EVENTS_DICT, EVENTS_LENGTH, EVENTS_SCHEMA,
-};
-use casper_execution_engine::core::engine_state::{
-    run_genesis_request::RunGenesisRequest, GenesisAccount,
 };
 use casper_types::{
     account::AccountHash,
     bytesrepr::{Bytes, FromBytes},
     contracts::NamedKeys,
-    Key, Motes, PublicKey, RuntimeArgs, SecretKey, StoredValue, URef, U512,
+    GenesisAccount, Key, Motes, PublicKey, RuntimeArgs, SecretKey, StoredValue, URef, U512,
 };
 use integration_tests::{Mint, Transfer};
 
 struct TestEnv {
-    context: InMemoryWasmTestBuilder,
+    context: LmdbWasmTestBuilder,
     account_addr: AccountHash,
 }
 
@@ -36,18 +33,14 @@ impl TestEnv {
             None,
         );
 
-        let mut genesis_config = DEFAULT_GENESIS_CONFIG.clone();
-        genesis_config.ee_config_mut().push_account(account);
+        let mut genesis_request = LOCAL_GENESIS_REQUEST.clone();
+        genesis_request.push_genesis_account(account);
 
-        let run_genesis_request = RunGenesisRequest::new(
-            *DEFAULT_GENESIS_CONFIG_HASH,
-            genesis_config.protocol_version(),
-            genesis_config.take_ee_config(),
-            DEFAULT_CHAINSPEC_REGISTRY.clone(),
-        );
-
-        let mut context = InMemoryWasmTestBuilder::default();
-        context.run_genesis(&run_genesis_request).commit();
+        let mut context = LmdbWasmTestBuilder::default();
+        context
+            .run_genesis(genesis_request)
+            .commit()
+            .advance_eras_by_default_auction_delay();
 
         TestEnv {
             context,
@@ -69,7 +62,8 @@ impl TestEnv {
 
     pub fn named_keys(&self) -> NamedKeys {
         self.context
-            .get_expected_account(self.default_account())
+            .get_account(self.default_account())
+            .unwrap()
             .named_keys()
             .clone()
     }
@@ -147,10 +141,10 @@ fn test_events_initalization() {
     test_env.deploy_event_initializer_wasm();
 
     let named_keys = test_env.named_keys();
-    assert!(named_keys.contains_key(EVENTS_DICT));
-    assert!(named_keys.contains_key(EVENTS_LENGTH));
-    assert!(named_keys.contains_key(EVENTS_SCHEMA));
-    assert!(named_keys.contains_key(CES_VERSION_KEY));
+    assert!(named_keys.contains(EVENTS_DICT));
+    assert!(named_keys.contains(EVENTS_LENGTH));
+    assert!(named_keys.contains(EVENTS_SCHEMA));
+    assert!(named_keys.contains(CES_VERSION_KEY));
     assert_eq!(test_env.events_length(), 0);
     assert_eq!(test_env.ces_version(), CES_VERSION);
 

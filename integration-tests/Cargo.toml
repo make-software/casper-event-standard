@@ -4,11 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-casper-types = "4.0.1"
+casper-types = { workspace = true }
 casper-event-standard = { path = "../casper-event-standard" }
-casper-contract = { version = "4.0.0", optional = true }
-casper-engine-test-support = { version = "7.0.1", optional = true }
-casper-execution-engine = { version = "7.0.1", optional = true }
+casper-contract = { workspace = true, optional = true, features = ["no-std-helpers"] }
+casper-engine-test-support = { workspace = true, optional = true }
+casper-execution-engine = { workspace = true, optional = true }
 
 [features]
 default = ["test-support", "contract-support"]

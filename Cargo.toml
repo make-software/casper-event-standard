@@ -1,4 +1,5 @@
 [workspace]
+resolver = "2"
 members = [
     "casper-event-standard",
     "casper-event-standard-macro",
@@ -6,7 +7,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.5.0"
+version = "0.6.0"
 authors = ["Maciej Zieliński <maciej@odra.dev>"]
 description = "The smart contract level events for Casper."
 edition = "2021"
@@ -15,10 +16,8 @@ repository = "https://github.com/make-software/casper-event-standard"
 license = "Apache-2.0"
 
 [workspace.dependencies]
-casper-types = "5.0.0"
-casper-contract = { git = "https://github.com/casper-network/casper-node.git", branch = "release-2.0.0-rc9", default-features = false }
-casper-execution-engine = { git = "https://github.com/casper-network/casper-node.git", branch = "release-2.0.0-rc9" }
-casper-engine-test-support = { git = "https://github.com/casper-network/casper-node.git", branch = "release-2.0.0-rc9" }
+casper-types = "5"
+casper-contract = { version = "5", default-features = false }
+casper-execution-engine = "8"
+casper-engine-test-support = "8"
 
-[patch.crates-io]
-casper-types = { version = "5.0.0", git = "https://github.com/casper-network/casper-node.git", branch = "release-2.0.0-rc9" }

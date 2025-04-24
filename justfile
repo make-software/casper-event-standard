@@ -12,7 +12,7 @@ test-lib:
 test-macro:
     cargo test -p casper-event-standard-macro
 
-test-integration: build-test-wasm copy-wasm-file test-integration-only
+test-integration: build-test-wasm copy-wasm-file optimize-wasm test-integration-only
 
 test-integration-only:
     cargo test -p integration-tests \
@@ -31,6 +31,12 @@ build-test-wasm:
 copy-wasm-file:
     mkdir -p integration-tests/wasm
     cp target/wasm32-unknown-unknown/release/*.wasm integration-tests/wasm
+
+optimize-wasm:
+    wasm-opt --strip-debug --signext-lowering integration-tests/wasm/event_initializer.wasm \
+        -o integration-tests/wasm/event_initializer.wasm
+    wasm-opt --strip-debug --signext-lowering integration-tests/wasm/event_producer.wasm \
+        -o integration-tests/wasm/event_producer.wasm
 
 clean:
     rm -rf integration-tests/wasm
