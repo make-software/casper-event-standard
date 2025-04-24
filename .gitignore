@@ -1,3 +1,4 @@
+.idea
 /target
 /Cargo.lock
 integration-tests/wasm
