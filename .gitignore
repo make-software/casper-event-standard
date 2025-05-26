@@ -2,3 +2,4 @@
 /target
 /Cargo.lock
 integration-tests/wasm
+.DS_Store

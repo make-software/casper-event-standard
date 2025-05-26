@@ -7,7 +7,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.6.0"
+version = "0.7.0"
 authors = ["Maciej Zieliński <maciej@odra.dev>"]
 description = "The smart contract level events for Casper."
 edition = "2021"
@@ -16,7 +16,7 @@ repository = "https://github.com/make-software/casper-event-standard"
 license = "Apache-2.0"
 
 [workspace.dependencies]
-casper-types = "5"
+casper-types = "6"
 casper-contract = { version = "5", default-features = false }
 casper-execution-engine = "8"
 casper-engine-test-support = "8"
